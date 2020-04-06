@@ -23,9 +23,16 @@ export default class MyContainerConfig extends React.Component {
   currentForm = () => {
     switch (this.props.mode) {
       case 'forced':
-        return (<MyFormForced onChange={this.props.onForcedChange} forced={this.props.forced}/>);
+        return (<MyFormForced
+          forced={this.props.forced}
+          onChange={this.props.onForcedChange} />);
       case 'auto':
-        return (<MyFormAuto onChange={this.props.onNormalChange} normal={this.props.normal}/>);
+        return (<MyFormAuto
+          normal={this.props.normal}
+          ranges={this.props.ranges}
+          onChange={this.props.onNormalChange}
+          onAddRange={this.props.onAddRange}
+          onRemoveRange={this.props.onRemoveRange} />);
       case 'off':
         return (<MyFormOff/>);
       default:
@@ -37,18 +44,6 @@ export default class MyContainerConfig extends React.Component {
     const form = this.currentForm();
     return (
       <Container fluid={true}>
-        <Row>
-          <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-            <DropdownToggle caret size="lg">
-              Choix mode
-            </DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={this.props.onForcedMode}>Forcé</DropdownItem>
-              <DropdownItem onClick={this.props.onAutoMode}>Auto</DropdownItem>
-              <DropdownItem onClick={this.props.onOffMode}>Arrêt</DropdownItem>
-            </DropdownMenu>
-          </ButtonDropdown>
-        </Row>
         <Row>
           {form}
         </Row>

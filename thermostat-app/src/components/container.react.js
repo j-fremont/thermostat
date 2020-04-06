@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
 import MyMedia from '../components/media.react';
+import MyDropdownMode from '../components/dropdown.mode.react';
 import MyContainerConfig from '../components/container.config.react';
 import axios from "axios";
 import io from "socket.io-client";
@@ -13,10 +14,11 @@ export default class MyContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mode: 'auto', // forced, auto, off
-      forced: 30,
-      normal: 20,
-      ranges: []
+      mode: 'auto', // Mode : forced, auto, off
+      forced: 30, // Température en mode forced
+      normal: 20, // Température hors plages en mode auto
+      ranges: [], // Plages
+      id: 0 // Identifiant d'une plage
     };
   }
 
@@ -56,6 +58,35 @@ export default class MyContainer extends React.Component {
     });
   }
 
+  onAddRange = () => {
+
+    const id = this.state.id;
+
+    this.setState({
+      id: id+1,
+      ranges: [...this.state.ranges,
+        {
+          id: id,
+          value: 20,
+          start: '18:00',
+          end: '20:00',
+          days: [true, true, true, true, true, false, false]
+        }
+      ]
+    });
+  }
+
+  onRemoveRange = (id) => {
+
+    console.log(id);
+
+    const ranges = this.state.ranges.filter(range => range.id != id);
+
+    this.setState({
+      ranges: ranges
+    });
+  }
+
   onSubmit = () => {
     socket.emit('sock_thermostat', this.state);
   }
@@ -65,24 +96,28 @@ export default class MyContainer extends React.Component {
       <Container fluid={true}>
         <Row>
           <Col xs="5">
-            <MyMedia mode={this.state.mode}/>
+            <MyMedia mode={this.state.mode} />
           </Col>
           <Col xs="5">
+            <MyDropdownMode
+              onForcedMode={this.onForcedMode}
+              onAutoMode={this.onAutoMode}
+              onOffMode={this.onOffMode} />
             <Button size="lg" onClick={this.onSubmit}>Envoyer</Button>
           </Col>
         </Row>
         <Row>
           <Col xs="6">
             <MyContainerConfig
-              onForcedMode={this.onForcedMode}
-              onAutoMode={this.onAutoMode}
-              onOffMode={this.onOffMode}
-              onForcedChange={this.onForcedChange}
-              onNormalChange={this.onNormalChange}
-              onSubmit={this.onSubmit}
               mode={this.state.mode}
               forced={this.state.forced}
-              normal={this.state.normal}/>
+              normal={this.state.normal}
+              ranges={this.state.ranges}
+              onForcedChange={this.onForcedChange}
+              onNormalChange={this.onNormalChange}
+              onAddRange={this.onAddRange}
+              onRemoveRange={this.onRemoveRange}
+              onSubmit={this.onSubmit} />
           </Col>
           <Col xs="6">
 
