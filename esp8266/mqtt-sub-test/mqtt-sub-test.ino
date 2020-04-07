@@ -1,24 +1,23 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
-#include <ArduinoJson.h>
 
-#define WIFI_SSID "MY_SSID"
-#define WIFI_PASS "MY_PASS"
+#define WIFI_SSID "NEUF_4EEC"
+#define WIFI_PASS "yosickkobkowgawboit0"
 
-#define MOSQUITTO_IP "192.168.1.10"
+#define MOSQUITTO_IP "192.168.1.39"
 
 WiFiClient espClient;
-PubSubClient mqttClient(espClient);
+PubSubClient client(espClient);
 
 // Function prototypes
 void subscribeReceive(char* topic, byte* payload, unsigned int length);
 
-void setup() {
-
-  Serial.begin(115200);
+void setup_wifi() {
+  Serial.print("Connexion a ");
+  Serial.println(WIFI_SSID);
 
   WiFi.begin(WIFI_SSID, WIFI_PASS);
-  pinMode(LED_BUILTIN, OUTPUT);
+
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(LED_BUILTIN,HIGH);
     delay(250);
@@ -26,45 +25,40 @@ void setup() {
     delay(250);
   }
 
-  Serial.println("WiFi connected...");
+  Serial.println("Connexion WiFi etablie ");
+  Serial.print("=> Addresse IP : ");
+  Serial.print(WiFi.localIP());
+}
 
-  mqttClient.setServer(MOSQUITTO_IP, 1883);
- 
-  // Attempt to connect to the server with the ID "myClientID"
-  if (mqttClient.connect("myClientID")) 
-  {
-    Serial.println("Connection has been established, well done");
- 
-    // Establish the subscribe event
-    mqttClient.setCallback(subscribeReceive);
-  } 
-  else 
-  {
-    Serial.println("Looks like the server connection failed...");
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Connexion au serveur MQTT...");
+    if (client.connect("ESP8266Client")) {
+      Serial.println("OK");
+    } else {
+      Serial.print("KO, erreur : ");
+      Serial.print(client.state());
+      Serial.println(" On attend 5 secondes avant de recommencer");
+      delay(5000);
+    }
   }
+}
 
+void setup() {
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(MOSQUITTO_IP, 1883);
+  client.setCallback(subscribeReceive);
 }
 
 void loop() {
-    // This is needed at the top of the loop!
-  mqttClient.loop();
- 
-  // Ensure that we are subscribed to the topic "MakerIOTopic"
-  mqttClient.subscribe("thermostat");
- 
-  // Attempt to publish a value to the topic "MakerIOTopic"
-  /*if(mqttClient.publish("thermostat", "Hello World"))
-  {
-    Serial.println("Publish message success");
+  if (!client.connected()) {
+    reconnect();
   }
-  else
-  {
-    Serial.println("Could not send message :(");
-  }*/
- 
-  // Dont overload the server!
-  delay(4000);
+  client.loop();
+  client.subscribe("thermostat");
 
+  delay(5000);
 }
 
 void subscribeReceive(char* topic, byte* payload, unsigned int length)
