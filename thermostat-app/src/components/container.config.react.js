@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Row } from 'reactstrap';
 import MyFormForced from '../components/form.forced.react';
 import MyFormAuto from '../components/form.auto.react';
 import MyFormOff from '../components/form.off.react';
@@ -32,7 +32,11 @@ export default class MyContainerConfig extends React.Component {
           ranges={this.props.ranges}
           onChange={this.props.onNormalChange}
           onAddRange={this.props.onAddRange}
-          onRemoveRange={this.props.onRemoveRange} />);
+					onRemoveRange={this.props.onRemoveRange}
+					onChangeTemperature={this.props.onChangeTemperature}
+					onChangeStart={this.props.onChangeStart}
+					onChangeEnd={this.props.onChangeEnd}
+					onToggleDay={this.props.onToggleDay} />);
       case 'off':
         return (<MyFormOff/>);
       default:
@@ -43,11 +47,9 @@ export default class MyContainerConfig extends React.Component {
   render() {
     const form = this.currentForm();
     return (
-      <Container fluid={true}>
-        <Row>
-          {form}
-        </Row>
-      </Container>
+      <Row>
+				{form}
+      </Row>
     );
   }
 }

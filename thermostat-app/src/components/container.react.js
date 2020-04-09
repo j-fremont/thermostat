@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Button } from 'reactstrap';
+import { Container, Row, Col, Button, FormGroup, ButtonGroup } from 'reactstrap';
 import MyMedia from '../components/media.react';
 import MyDropdownMode from '../components/dropdown.mode.react';
 import MyContainerConfig from '../components/container.config.react';
@@ -60,29 +60,76 @@ export default class MyContainer extends React.Component {
 
   onAddRange = () => {
 
-    const id = this.state.id;
+		if (this.state.ranges.length < 4) {
 
-    this.setState({
-      id: id+1,
-      ranges: [...this.state.ranges,
-        {
-          id: id,
-          value: 20,
-          start: '18:00',
-          end: '20:00',
-          days: [true, true, true, true, true, false, false]
-        }
-      ]
-    });
+		  const id = this.state.id;
+
+		  this.setState({
+		    id: id+1,
+		    ranges: [...this.state.ranges,
+		      {
+		        id: id,
+		        value: 20,
+		        start: '18:00',
+		        end: '20:00',
+		        days: [true, true, true, true, true, false, false]
+		      }
+		    ]
+		  });
+		}
   }
 
   onRemoveRange = (id) => {
 
-    console.log(id);
-
-    const ranges = this.state.ranges.filter(range => range.id != id);
+    const ranges = this.state.ranges.filter(range => range.id !== id);
 
     this.setState({
+      ranges: ranges
+    });
+  }
+
+  onChangeTemperature = (id, value) => {
+
+		var ranges = this.state.ranges;
+
+		ranges.filter(range => range.id === id)[0].value = value;
+
+		this.setState({
+      ranges: ranges
+    });
+  }
+
+  onChangeStart = (id, value) => {
+
+		var ranges = this.state.ranges;
+
+		ranges.filter(range => range.id === id)[0].start = value;
+
+		this.setState({
+      ranges: ranges
+    });
+  }
+
+  onChangeEnd = (id, value) => {
+
+		var ranges = this.state.ranges;
+
+		ranges.filter(range => range.id === id)[0].end = value;
+
+		this.setState({
+      ranges: ranges
+    });
+  }
+
+  onToggleDay = (id, day) => {
+
+		var ranges = this.state.ranges;
+
+		var range = ranges.filter(range => range.id === id)[0];
+
+		range.days[day] = !range.days[day];
+
+		this.setState({
       ranges: ranges
     });
   }
@@ -99,15 +146,19 @@ export default class MyContainer extends React.Component {
             <MyMedia mode={this.state.mode} />
           </Col>
           <Col xs="5">
-            <MyDropdownMode
-              onForcedMode={this.onForcedMode}
-              onAutoMode={this.onAutoMode}
-              onOffMode={this.onOffMode} />
-            <Button size="lg" onClick={this.onSubmit}>Envoyer</Button>
+  					<FormGroup>
+    					<ButtonGroup>
+								<MyDropdownMode
+              		onForcedMode={this.onForcedMode}
+              		onAutoMode={this.onAutoMode}
+              		onOffMode={this.onOffMode} />
+            		<Button size="lg" onClick={this.onSubmit}>Envoyer</Button>
+    					</ButtonGroup>
+  					</FormGroup>
           </Col>
         </Row>
         <Row>
-          <Col xs="6">
+          <Col>
             <MyContainerConfig
               mode={this.state.mode}
               forced={this.state.forced}
@@ -116,11 +167,12 @@ export default class MyContainer extends React.Component {
               onForcedChange={this.onForcedChange}
               onNormalChange={this.onNormalChange}
               onAddRange={this.onAddRange}
-              onRemoveRange={this.onRemoveRange}
+             	onRemoveRange={this.onRemoveRange}
+							onChangeTemperature={this.onChangeTemperature}
+							onChangeStart={this.onChangeStart}
+							onChangeEnd={this.onChangeEnd}
+							onToggleDay={this.onToggleDay}
               onSubmit={this.onSubmit} />
-          </Col>
-          <Col xs="6">
-
           </Col>
         </Row>
       </Container>
