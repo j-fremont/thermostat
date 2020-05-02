@@ -6,12 +6,12 @@ Replace the deficient thermostat of a towel dryer by an app that supervises temp
 
 The app.
 
-## Arduino
+## arduino
 
 Arduino sketches.
 
 Replaced by ESP8266 because of a (supposed) deficient Ethernet shield.
 
-## ESP8266
+## esp8266
 
 ESP8266 sketches.
