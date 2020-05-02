@@ -1,12 +1,13 @@
 
 # thermostat-app
 
-Create.
+Create and load dependencies.
 
 ```bash
 $ npm install -g create-react-app
 ...
-$ create-react-app thermostat-app
+$ cd thermostat
+[thermostat]$ create-react-app thermostat-app
 ...
 $ cd thermostat-app
 [thermostat-app]$ npm install react react-dom --save
@@ -14,16 +15,26 @@ $ cd thermostat-app
 [thermostat-app]$ npm install mqtt socket.io --save
 [thermostat-app]$ npm install cors express --save
 [thermostat-app]$ npm install axios --save
+[thermostat-app]$ npm install concurrently --save 
 ```
 
 Install.
 
-```bash
+```
 [thermostat-app]$ npm install
 ```
 
-Start.
+Run the server.
+```
+[thermostat-app]$ node server.js
+```
 
-```bash
+Run the client.
+```
 [thermostat-app]$ npm start
+```
+
+Run the client and the server concurrently.
+```
+[thermostat-app]$ npm run dev
 ```
