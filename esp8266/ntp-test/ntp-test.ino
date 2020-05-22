@@ -2,8 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-#define WIFI_SSID "NEUF_4EEC"
-#define WIFI_PASS "yosickkobkowgawboit0"
+#define WIFI_SSID "MY_SSID"
+#define WIFI_PASS "MY_PASS"
 
 const long utcOffsetInSeconds = 3600;
 
