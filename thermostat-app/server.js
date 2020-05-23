@@ -30,7 +30,9 @@ io.on('connection', socket => {
   socket.on('sock_thermostat', (payload) => {
     console.log(payload);
     const json = JSON.stringify(payload);
-    client.publish('thermostat', json, (error) => {
+		const buffer = bufferize(payload);
+    //client.publish('thermostat', json, (error) => {
+    client.publish('thermostat', buffer, (error) => {
       if (error) {
         console.log(error);
       } else {
@@ -43,6 +45,28 @@ io.on('connection', socket => {
     });
   });
 });
+
+const bufferize = (json) => {
+	var mode;
+	switch(json.mode) {
+		case 'auto':
+			var ranges = '';
+			json.ranges.forEach(range => {
+				const start = range.start.split(':')[0].toString() + range.start.split(':')[1].toString();
+				const end = range.end.split(':')[0].toString() + range.end.split(':')[1].toString();
+				var days = '';
+				range.days.forEach(day => {
+					days += day ? '1' : '0';
+				});				
+				ranges += range.value.toString() + start + end + days;
+			});
+			return '1' + json.normal.toString() + ranges;
+		case 'forced':
+			return '2' + json.forced.toString();
+		default:
+			return '0';
+	}
+}
 
 http.listen(config.server.port, () => {
   console.log('listening on *:' + config.server.port);
