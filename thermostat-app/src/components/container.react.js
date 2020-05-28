@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Button, FormGroup, ButtonGroup } from 'reactstrap';
 import MyMedia from '../components/media.react';
+import MyAlert from '../components/alert.react';
 import MyDropdownMode from '../components/dropdown.mode.react';
 import MyContainerConfig from '../components/container.config.react';
 import axios from "axios";
@@ -15,15 +16,17 @@ export default class MyContainer extends React.Component {
     super(props);
     this.state = {
       mode: 'auto', // Mode : forced, auto, off
-      forced: 30, // Température en mode forced
-      normal: 20, // Température hors plages en mode auto
-      ranges: [], // Plages
-      id: 0 // Identifiant d'une plage
+      forced: undefined, // Température en mode forced
+      normal: undefined, // Température hors plages en mode auto
+      slots: [], // Plages
+      id: 0, // Identifiant d'une plage
+			alert: undefined
     };
   }
 
   componentDidMount() {
     axios.get("http://" + config.server.host + ":" + config.server.port + "/state").then((response) => {
+			console.log(response.data);
       this.setState(response.data);
     });
   }
@@ -58,94 +61,117 @@ export default class MyContainer extends React.Component {
     });
   }
 
-  onAddRange = () => {
+  onAddSlot = () => {
 
-		if (this.state.ranges.length < 4) {
+		if (this.state.slots.length < 4) {
 
 		  const id = this.state.id;
 
 		  this.setState({
 		    id: id+1,
-		    ranges: [...this.state.ranges,
+		    slots: [...this.state.slots,
 		      {
 		        id: id,
 		        value: 20,
 		        start: '18:00',
 		        end: '20:00',
-		        days: [true, true, true, true, true, false, false]
+		        days: [false, true, true, true, true, true, false]
 		      }
 		    ]
 		  });
 		}
   }
 
-  onRemoveRange = (id) => {
+  onRemoveSlot = (id) => {
 
-    const ranges = this.state.ranges.filter(range => range.id !== id);
+    const slots = this.state.slots.filter(slot => slot.id !== id);
 
     this.setState({
-      ranges: ranges
+      slots: slots
     });
   }
 
   onChangeTemperature = (id, value) => {
 
-		var ranges = this.state.ranges;
+		var slots = this.state.slots;
 
-		ranges.filter(range => range.id === id)[0].value = value;
+		slots.filter(slot => slot.id === id)[0].value = value;
 
 		this.setState({
-      ranges: ranges
+      slots: slots
     });
   }
 
   onChangeStart = (id, value) => {
 
-		var ranges = this.state.ranges;
+		var slots = this.state.slots;
 
-		ranges.filter(range => range.id === id)[0].start = value;
+		slots.filter(slot => slot.id === id)[0].start = value;
 
 		this.setState({
-      ranges: ranges
+      slots: slots
     });
   }
 
   onChangeEnd = (id, value) => {
 
-		var ranges = this.state.ranges;
+		var slots = this.state.slots;
 
-		ranges.filter(range => range.id === id)[0].end = value;
+		slots.filter(slot => slot.id === id)[0].end = value;
 
 		this.setState({
-      ranges: ranges
+      slots: slots
     });
   }
 
   onToggleDay = (id, day) => {
 
-		var ranges = this.state.ranges;
+		var slots = this.state.slots;
 
-		var range = ranges.filter(range => range.id === id)[0];
+		var slot = slots.filter(slot => slot.id === id)[0];
 
-		range.days[day] = !range.days[day];
+		slot.days[day] = !slot.days[day];
 
 		this.setState({
-      ranges: ranges
+      slots: slots
     });
   }
 
   onSubmit = () => {
     socket.emit('sock_thermostat', this.state);
+		this.setState({
+      alert: {
+				color: 'primary',
+				message: 'Message envoyé !'
+			}
+    });
   }
 
+	getAlert = () => {
+		if (this.state.alert!==undefined) {
+			return (
+				<MyAlert color={this.state.alert.color} message={this.state.alert.message} resetAlert={this.resetAlert}/>
+			)
+		}
+	}
+
+	resetAlert = () => {
+		this.setState({
+      alert: undefined
+    });
+	}
+
   render() {
+
+		let alert = this.getAlert();
+
     return (
       <Container fluid={true}>
         <Row>
-          <Col xs="5">
+          <Col xs="4">
             <MyMedia mode={this.state.mode} />
           </Col>
-          <Col xs="5">
+          <Col xs="4">
   					<FormGroup>
     					<ButtonGroup>
 								<MyDropdownMode
@@ -156,6 +182,9 @@ export default class MyContainer extends React.Component {
     					</ButtonGroup>
   					</FormGroup>
           </Col>
+          <Col xs="4">
+						{alert}
+          </Col>
         </Row>
         <Row>
           <Col>
@@ -163,11 +192,11 @@ export default class MyContainer extends React.Component {
               mode={this.state.mode}
               forced={this.state.forced}
               normal={this.state.normal}
-              ranges={this.state.ranges}
+              slots={this.state.slots}
               onForcedChange={this.onForcedChange}
               onNormalChange={this.onNormalChange}
-              onAddRange={this.onAddRange}
-             	onRemoveRange={this.onRemoveRange}
+              onAddSlot={this.onAddSlot}
+             	onRemoveSlot={this.onRemoveSlot}
 							onChangeTemperature={this.onChangeTemperature}
 							onChangeStart={this.onChangeStart}
 							onChangeEnd={this.onChangeEnd}

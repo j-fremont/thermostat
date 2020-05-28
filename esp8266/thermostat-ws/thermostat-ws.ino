@@ -1,4 +1,3 @@
-#include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
@@ -6,8 +5,6 @@
 
 #define WIFI_SSID "MY_SSID"
 #define WIFI_PASS "MY_PASS"
-
-#define MOSQUITTO_IP "192.168.1.10"
 
 #define DHT_TYPE DHT11
 #define DHT_PIN D1
@@ -21,11 +18,12 @@ const long utcOffsetInSeconds = 3600;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
-// Define MQTT server to receive time slots
-WiFiClient espClient;
-PubSubClient client(espClient);
-
-const String sensor = String("bathroom");
+// Define HTTP server (port 80) on static IP to get slots
+WiFiServer server(80);
+IPAddress ipadress(192, 168, 1, 11);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns(8, 8, 8, 8);
 
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
@@ -49,25 +47,22 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 // [61-64] : slot 4 - end
 // [65-71] : slot 4 - days
 
-char slots[80] = "0";
+//char slots[80] = "0";
 //char slots[80] = "1200";
 //char slots[80] = "120130060008001111100"; // Slot 1 : 30° btw 06:00-08:00 from Monday to Friday
 //char slots[80] = "12023006000800111110030180020001111100"; // Slot 2 : 30° btw 18:00-20:00 from Monday to Friday
 //char slots[80] = "1203300600080011111003018002000111110030080010000000011"; // Slot 3 : 30° btw 08:00-10:00 from Saturday & Sunday
 //char slots[80] = "120430060008001111100301800200011111003008001000000001130190021000000011"; // Slot 4 : 30° btw 19:00-21:00 from Saturday & Sunday
-//char slots[80] = "230";
+char slots[80] = "230";
 int SLOT_SIZE = 17;
 
 int timer = 0;
 
-// Function prototypes
-void subscribeReceive(char* topic, byte* payload, unsigned int length);
-
 void setup()
 {
   Serial.begin(115200);
-  
   Serial.println("WiFi connect...");
+  WiFi.config(ipadress, gateway, subnet, dns);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -76,94 +71,80 @@ void setup()
   Serial.println("WiFi connected !");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  
+  server.begin();
+
   pinMode(RELAY_PIN, OUTPUT);
     
   timeClient.begin();
-
-  client.setServer(MOSQUITTO_IP, 1883);
-  client.setCallback(subscribeReceive);
-}
-
-void reconnect() {
-  while (!client.connected()) {
-    Serial.println("MQTT Connection...");
-    if (client.connect("ESP8266Client")) {
-      Serial.println("MQTT connected");
-    } else {
-      Serial.print("MQTT error : ");
-      Serial.print(client.state());
-      delay(5000);
-    }
-  }
 }
 
 void loop()
 {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-  client.subscribe("thermostat");
 
-  if (timer > 300) { // Re-evaluate temperature vs. slots every 5 minutes
-    
-    timer=0;
-    
-    Serial.print("\nSlots:");
-    Serial.println(slots);
-    Serial.println(strlen(slots));
+  WiFiClient client = server.available(); // Listen for incoming clients.
   
-    dht.begin();
-    float h = dht.readHumidity();
-    float t = dht.readTemperature();
-    Serial.println((float)t, 1);
-    Serial.println((float)h, 1);
+  if (client) { // If a new client connects...
+    
+    Serial.println("New client...");
+    int i=0;
+    char input[100] = {0};
+    while (client.connected()) { // ...loop while the client's connected.
+      if (client.available()) { // if there's bytes to read from the client...
+        char c = client.read(); // ...read the byte.
+        Serial.write(c);
+        //Serial.print(c, HEX);
+        input[i++]=c;
+        if (c == 0xD) {
+          memset(slots, 0, 80); // Empty slots array...
+          strncpy(slots, &input[6], i-15); // ...and copy input from "POST /" (pos. 6) to " HTTP/1.1" (pos. end-15).
+          client.stop();
+          client.flush();
+          client.print("HTTP/1.1 200 OK");
 
-    if (client.connected()) {
-      
-      String t_msg = String("{\"sensor\":\"") + sensor + String("\",\"value\":") + String(t) + String("}");
-      client.publish("temperature", t_msg.c_str());
-      
-      String h_msg = String("{\"sensor\":\"") + sensor + String("\",\"value\":") + String(h) + String("}");
-      client.publish("humidity", h_msg.c_str());
+        }
+      }
+    }
+    
+  } else {
+
+    if (timer > 60) {
+
+      timer=0;
+
+      Serial.print("\nSlots:");
+      Serial.println(slots);
+      Serial.println(strlen(slots));
+  
+      dht.begin();
+      float h = dht.readHumidity();
+      float t = dht.readTemperature();
+      Serial.println((float)t, 1);
+      Serial.println((float)h, 1);
+
+      timeClient.update();
+
+      Serial.print(daysOfTheWeek[timeClient.getDay()]);
+      Serial.print(", ");
+      Serial.print(timeClient.getHours());
+      Serial.print(":");
+      Serial.print(timeClient.getMinutes());
+      Serial.print(":");
+      Serial.println(timeClient.getSeconds());
+
+      if (relayOn(t, timeClient.getDay(), timeClient.getHours(), timeClient.getMinutes())) {
+        Serial.println("Relay ON !");
+        digitalWrite (RELAY_PIN, HIGH);
+      } else {
+        Serial.println("Relay OFF !");
+        digitalWrite (RELAY_PIN, LOW);
+      }
     }
 
-    timeClient.update();
+    delay (1000);
 
-    Serial.print(daysOfTheWeek[timeClient.getDay()]);
-    Serial.print(", ");
-    Serial.print(timeClient.getHours());
-    Serial.print(":");
-    Serial.print(timeClient.getMinutes());
-    Serial.print(":");
-    Serial.println(timeClient.getSeconds());
-
-    if (relayOn(t, timeClient.getDay(), timeClient.getHours(), timeClient.getMinutes())) {
-      Serial.println("Relay ON !");
-      digitalWrite (RELAY_PIN, HIGH);
-    } else {
-      Serial.println("Relay OFF !");
-      digitalWrite (RELAY_PIN, LOW);
-    }
+    timer++;
+   
   }
-
-  delay(1000);
-  
-  timer++;
-}
-
-void subscribeReceive(char* topic, byte* payload, unsigned int length)
-{
-  Serial.print("\nMessage: ");
-  for(int i = 0; i < length; i ++)
-  {
-    Serial.print(char(payload[i]));
-  }
-  Serial.println("");
-
-  memset(slots, 0, 80); // Empty slots array...
-  strncpy(slots, (char*)payload, length); // ...and copy message.
 }
 
 boolean relayOn(int temperature, int ntp_day, int ntp_hours, int ntp_minutes)
@@ -195,10 +176,22 @@ boolean relayOn(int temperature, int ntp_day, int ntp_hours, int ntp_minutes)
       relay = false;
     }
 
+    Serial.println("normal:");
+    Serial.print(atoi(normal));
+    Serial.print("\n");
+    
+    Serial.println("relay:");
+    Serial.print(relay);
+    Serial.print("\n");
+
     char nb_slots[2] = {0};
     strncpy(nb_slots, &slots[3], 1);
 
     int i_nb_slots = atoi(nb_slots); // 0, 1, 2, 3 or 4 slots
+
+    Serial.println("nb_slots:");
+    Serial.print(i_nb_slots);
+    Serial.print("\n");    
 
     for (int i=0;i<i_nb_slots;i++) {
 
@@ -210,8 +203,14 @@ boolean relayOn(int temperature, int ntp_day, int ntp_hours, int ntp_minutes)
       strncpy(end, &slots[10+(SLOT_SIZE*i)], 4);
       char days[8] = {0};
       strncpy(days, &slots[14+(SLOT_SIZE*i)], 7);
+
+      Serial.println("day:");
+      Serial.write(days[ntp_day]);
+      Serial.print("\n");
       
       if (days[ntp_day]=='1' && onSlot(ntp_hours, ntp_minutes, start, end)) {
+
+        Serial.println("on slot");
 
         if (temperature < atoi(value)) {
           relay = true;
@@ -222,6 +221,8 @@ boolean relayOn(int temperature, int ntp_day, int ntp_hours, int ntp_minutes)
         break;  
       }
     }
+
+Serial.print(relay);
 
     return relay;
   }

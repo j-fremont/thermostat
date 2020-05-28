@@ -6,19 +6,13 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const fs = require('fs');
 const config = require('./src/config');
-const mqtt = require('mqtt');
+const axios = require('axios');
 
 var stateRouter = require('./routes/state');
 
 app.use(cors());
 
 app.use('/state', stateRouter);
-
-const client = mqtt.connect('mqtt://' + config.mqtt.host + ':' + config.mqtt.port);
-
-client.on('connect', () => {
-  console.log('mqtt connected');
-});
 
 io.on('connection', socket => {
   console.log('web socket connected');
@@ -28,20 +22,26 @@ io.on('connection', socket => {
   });
 
   socket.on('sock_thermostat', (payload) => {
-
     const json = JSON.stringify(payload);
     const buffer = bufferize(payload);
 
-		client.publish('thermostat', buffer, (error) => {
-      if (error) {
-        console.log(error);
-      } else {
-        fs.writeFile("state.json", json, (error) => {
-          if (error) {
-            console.log(error);
-          }
-        });
-      }
+	  fs.writeFile("state.json", json, error => {
+	    if (error) throw error;
+	  });
+
+    axios({
+      method: 'post',
+      url: 'http://192.168.1.11/' + buffer,
+      headers: {
+        'Content-Type': 'text/plain'
+      },
+      data: 'app-message:' + buffer 
+    })
+    .then(response => {
+      console.log(response);
+    })
+    .catch(error => {
+      console.log(error);
     });
   });
 });

@@ -29,10 +29,10 @@ export default class MyContainerConfig extends React.Component {
       case 'auto':
         return (<MyFormAuto
           normal={this.props.normal}
-          ranges={this.props.ranges}
+          slots={this.props.slots}
           onChange={this.props.onNormalChange}
-          onAddRange={this.props.onAddRange}
-					onRemoveRange={this.props.onRemoveRange}
+          onAddSlot={this.props.onAddSlot}
+					onRemoveSlot={this.props.onRemoveSlot}
 					onChangeTemperature={this.props.onChangeTemperature}
 					onChangeStart={this.props.onChangeStart}
 					onChangeEnd={this.props.onChangeEnd}

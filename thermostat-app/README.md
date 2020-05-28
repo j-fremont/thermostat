@@ -12,10 +12,11 @@ $ cd thermostat
 $ cd thermostat-app
 [thermostat-app]$ npm install react react-dom --save
 [thermostat-app]$ npm install bootstrap reactstrap --save
-[thermostat-app]$ npm install mqtt socket.io --save
+[thermostat-app]$ npm install socket.io --save
 [thermostat-app]$ npm install cors express --save
 [thermostat-app]$ npm install axios --save
 [thermostat-app]$ npm install concurrently --save 
+[thermostat-app]$ npm install body-parser --save
 ```
 
 Install.
