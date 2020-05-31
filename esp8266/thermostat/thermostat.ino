@@ -17,7 +17,8 @@
 DHT dht(DHT_PIN, DHT_TYPE);
 
 // Define NTP client to get time
-const long utcOffsetInSeconds = 3600;
+//const long utcOffsetInSeconds = 3600; // UTC+1 : heure d'hiver
+const long utcOffsetInSeconds = 7200; // UTC+2 : heure d'été
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
@@ -30,12 +31,12 @@ const String sensor = String("bathroom");
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 // [0]     : 0:off, 1:auto, 2:forced
-// [1-2]   : forced or normal temperature
+// [1-2]   : forced or normal temperature, 2 digits
 // [3]     : 0, 1, 2, 3 or 4 slots
-// [4-5]   : slot 1 - temperature value
-// [6-9]   : slot 1 - start
-// [10-13] : slot 1 - end
-// [14-20] : slot 1 - days
+// [4-5]   : slot 1 - temperature value, 2 digits
+// [6-9]   : slot 1 - start, "HHMM" format
+// [10-13] : slot 1 - end, "HHMM" format
+// [14-20] : slot 1 - days, 7 digits (0 or 1)
 // [21-22] : slot 2 - temperature value
 // [23-26] : slot 2 - start
 // [27-30] : slot 2 - end
@@ -58,7 +59,9 @@ char slots[80] = "0";
 //char slots[80] = "230";
 int SLOT_SIZE = 17;
 
-int timer = 0;
+int tick = 0;
+
+float t = 0, h = 0;
 
 // Function prototypes
 void subscribeReceive(char* topic, byte* payload, unsigned int length);
@@ -106,19 +109,9 @@ void loop()
   client.loop();
   client.subscribe("thermostat");
 
-  if (timer > 300) { // Re-evaluate temperature vs. slots every 5 minutes
+  if (tick == 600) { // Send measurements every 10 minutes
     
-    timer=0;
-    
-    Serial.print("\nSlots:");
-    Serial.println(slots);
-    Serial.println(strlen(slots));
-  
-    dht.begin();
-    float h = dht.readHumidity();
-    float t = dht.readTemperature();
-    Serial.println((float)t, 1);
-    Serial.println((float)h, 1);
+    tick=0;
 
     if (client.connected()) {
       
@@ -128,6 +121,19 @@ void loop()
       String h_msg = String("{\"sensor\":\"") + sensor + String("\",\"value\":") + String(h) + String("}");
       client.publish("humidity", h_msg.c_str());
     }
+  }
+
+  if (tick%60 == 0) { // Re-evaluate temperature vs. slots every minutes
+
+    dht.begin();
+    t = dht.readTemperature();
+    h = dht.readHumidity();
+    Serial.println((float)t, 1);
+    Serial.println((float)h, 1);
+
+    Serial.print("\nSlots:");
+    Serial.println(slots);
+    Serial.println(strlen(slots));
 
     timeClient.update();
 
@@ -150,7 +156,7 @@ void loop()
 
   delay(1000);
   
-  timer++;
+  tick++; // 1 tick = 1 second
 }
 
 void subscribeReceive(char* topic, byte* payload, unsigned int length)

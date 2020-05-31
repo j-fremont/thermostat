@@ -1,1 +1,1 @@
-{"mode":"forced","forced":"8","normal":"17","slots":[{"id":13,"value":"30","start":"18:00","end":"20:40","days":[false,true,true,true,true,true,false]}],"id":16}
+{"mode":"auto","forced":"30","normal":"18","slots":[{"id":13,"value":"22","start":"18:00","end":"20:00","days":[true,true,true,true,true,true,true]},{"id":16,"value":"22","start":"06:00","end":"08:00","days":[true,true,true,true,true,true,true]}],"id":17,"alert":{"color":"primary","message":"Message envoyé !"}}

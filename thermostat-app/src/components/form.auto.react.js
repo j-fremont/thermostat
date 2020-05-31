@@ -12,6 +12,7 @@ export default class MyFormAuto extends React.Component {
 				onChangeTemperature={this.props.onChangeTemperature}
 				onChangeStart={this.props.onChangeStart}
 				onChangeEnd={this.props.onChangeEnd}
+				//onToggleUtc={this.props.onToggleUtc}
 				onToggleDay={this.props.onToggleDay} />
     );
   }

@@ -32,6 +32,8 @@ io.on('connection', socket => {
     const json = JSON.stringify(payload);
     const buffer = bufferize(payload);
 
+		console.log(buffer);
+
 		client.publish('thermostat', buffer, (error) => {
       if (error) {
         console.log(error);
@@ -54,11 +56,13 @@ const bufferize = (json) => {
       json.slots.forEach(slot => {
         const start = slot.start.split(':')[0].toString() + slot.start.split(':')[1].toString();
         const end = slot.end.split(':')[0].toString() + slot.end.split(':')[1].toString();
+				//const utc = slot.utc ? '2' : '1';
         var days = '';
         slot.days.forEach(day => {
           days += day ? '1' : '0';
         });				
-        slots += ('0' + slot.value.toString()).slice(-2) + start + end + days;
+        //slots += ('0' + slot.value.toString()).slice(-2) + start + end + utc + days;
+				slots += ('0' + slot.value.toString()).slice(-2) + start + end + days;
       });
       return '1' + ('0' + json.normal.toString()).slice(-2) + json.slots.length.toString()  + slots;
     case 'forced':

@@ -31,6 +31,13 @@ export default class MySlot extends React.Component {
     }
 	}
 
+	/*toggleUtc = () => {
+    var onToggle = this.props.onToggleUtc;
+    if (onToggle) {
+      onToggle(this.props.slot.id);
+    }
+  }*/
+
 	toggleMonday = () => {
     var onToggle = this.props.onToggleDay;
     if (onToggle) {
@@ -81,7 +88,7 @@ export default class MySlot extends React.Component {
   }
 
 	render() {
-    return (
+		return (
 			<Col xs="3">
 		    <Form>
 		      <FormGroup>
@@ -105,7 +112,7 @@ export default class MySlot extends React.Component {
 				  <Row form>
 				    <Col md={3}>
 				      <FormGroup>
-				        <Label for="startTime">Jours</Label>
+				        <Label>Jours</Label>
 				      </FormGroup>
 				    </Col>
 				    <Col md={'auto'}>
@@ -154,3 +161,9 @@ export default class MySlot extends React.Component {
     );
   }
 }
+
+/*
+		      <FormGroup>
+		        <CustomInput type="switch" id={"switchUtc_"+this.props.slot.id} label="Heures d'été" checked={this.props.slot.utc} onChange={this.toggleUtc} />
+      		</FormGroup>
+*/

@@ -75,6 +75,7 @@ export default class MyContainer extends React.Component {
 		        value: 20,
 		        start: '18:00',
 		        end: '20:00',
+						//utc: true,
 		        days: [false, true, true, true, true, true, false]
 		      }
 		    ]
@@ -123,6 +124,19 @@ export default class MyContainer extends React.Component {
       slots: slots
     });
   }
+
+  /*onToggleUtc = (id) => {
+
+		var slots = this.state.slots;
+
+		var slot = slots.filter(slot => slot.id === id)[0];
+
+		slot.utc = !slot.utc;
+
+		this.setState({
+      slots: slots
+    });
+  }*/
 
   onToggleDay = (id, day) => {
 
@@ -200,6 +214,7 @@ export default class MyContainer extends React.Component {
 							onChangeTemperature={this.onChangeTemperature}
 							onChangeStart={this.onChangeStart}
 							onChangeEnd={this.onChangeEnd}
+							//onToggleUtc={this.onToggleUtc}
 							onToggleDay={this.onToggleDay}
               onSubmit={this.onSubmit} />
           </Col>
