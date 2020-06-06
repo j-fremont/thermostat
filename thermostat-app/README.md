@@ -50,6 +50,8 @@ Build Docker image.
 Run Docker image.
 ```
 [thermostat-app]$ docker run -d -p 9002:9002 -p 3004:3000 \
+--restart=always \
+--name=thermostat-app \
 -e MQTT_HOST='192.168.1.10' \
 -e NODEJS_HOST='localhost' \
 thermostat-app
