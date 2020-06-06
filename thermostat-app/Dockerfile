@@ -1,4 +1,3 @@
-#FROM hypriot/rpi-alpine-scratch
 FROM balenalib/rpi-alpine-node:latest
 
 RUN apk update && apk add gettext
