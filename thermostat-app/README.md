@@ -39,3 +39,18 @@ Run the client and the server concurrently.
 ```
 [thermostat-app]$ npm run dev
 ```
+
+## Docker
+
+Build Docker image.
+```
+[thermostat-app]$ docker build -t thermostat-app .
+```
+
+Run Docker image.
+```
+[thermostat-app]$ docker run -d -p 9002:9002 -p 3004:3000 \
+-e MQTT_HOST='192.168.1.10' \
+-e NODEJS_HOST='localhost' \
+thermostat-app
+```
