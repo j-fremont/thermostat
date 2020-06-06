@@ -53,6 +53,6 @@ Run Docker image.
 --restart=always \
 --name=thermostat-app \
 -e MQTT_HOST='192.168.1.10' \
--e NODEJS_HOST='localhost' \
+-e NODEJS_HOST='192.168.1.10' \
 thermostat-app
 ```
