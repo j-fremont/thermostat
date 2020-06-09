@@ -6,7 +6,8 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const fs = require('fs');
 const config = require('./src/config');
-const mqtt = require('mqtt');
+//const mqtt = require('mqtt');
+const net = require('net');
 
 var stateRouter = require('./routes/state');
 
@@ -14,11 +15,11 @@ app.use(cors());
 
 app.use('/state', stateRouter);
 
-const client = mqtt.connect('mqtt://' + config.mqtt.host + ':' + config.mqtt.port);
+/*const client = mqtt.connect('mqtt://' + config.mqtt.host + ':' + config.mqtt.port);
 
 client.on('connect', () => {
   console.log('mqtt connected');
-});
+});*/
 
 io.on('connection', socket => {
   console.log('web socket connected');
@@ -30,11 +31,11 @@ io.on('connection', socket => {
   socket.on('sock_thermostat', (payload) => {
 
     const json = JSON.stringify(payload);
-    const buffer = bufferize(payload);
+    const buffer = bufferize(payload)+'E';
 
 		console.log(buffer);
 
-		client.publish('thermostat', buffer, (error) => {
+		/*client.publish('thermostat', buffer, (error) => {
       if (error) {
         console.log(error);
       } else {
@@ -44,7 +45,13 @@ io.on('connection', socket => {
           }
         });
       }
-    });
+    });*/
+
+		var client = new net.Socket();
+			client.connect(config.nodemcu.port, config.nodemcu.host, function() {
+				console.log('Connected');
+				client.write(buffer);
+		});
   });
 });
 

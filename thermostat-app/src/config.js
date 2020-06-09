@@ -1,9 +1,14 @@
 
 var config = module.exports = {};
 
-config.mqtt = {
+/*config.mqtt = {
   host: '192.168.1.10',
   port: 1883
+};*/
+
+config.nodemcu = {
+	host: '192.168.1.11',
+	port: 8000
 };
 
 config.server = {
