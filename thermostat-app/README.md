@@ -47,12 +47,22 @@ Build Docker image.
 [thermostat-app]$ docker build -t thermostat-app .
 ```
 
-Run Docker image.
+Run Docker image, with NodeMCU in MQTT subscriber.
 ```
 [thermostat-app]$ docker run -d -p 9002:9002 -p 3004:3000 \
 --restart=always \
 --name=thermostat-app \
 -e MQTT_HOST='192.168.1.10' \
+-e NODEJS_HOST='192.168.1.10' \
+thermostat-app
+```
+
+Run Docker image, with NodeMCU in socket mode.
+```
+[thermostat-app]$ docker run -d -p 9002:9002 -p 3004:3000 \
+--restart=always \
+--name=thermostat-app \
+-e NODEMCU_HOST='192.168.1.11' \
 -e NODEJS_HOST='192.168.1.10' \
 thermostat-app
 ```
