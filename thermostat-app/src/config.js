@@ -7,8 +7,8 @@ var config = module.exports = {};
 };*/
 
 config.nodemcu = {
-	host: '192.168.1.11',
-	port: 8000
+  host: '192.168.1.11',
+  port: 8000
 };
 
 config.server = {
