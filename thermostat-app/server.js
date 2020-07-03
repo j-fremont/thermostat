@@ -31,9 +31,12 @@ io.on('connection', socket => {
   socket.on('sock_thermostat', (payload) => {
 
     const json = JSON.stringify(payload);
-    const buffer = bufferize(payload)+'E';
 
-		console.log(buffer);
+    fs.writeFile("state.json", json, (error) => {
+      if (error) {
+        console.log(error);
+      }
+    });
 
 		/*client.publish('thermostat', buffer, (error) => {
       if (error) {
@@ -46,6 +49,10 @@ io.on('connection', socket => {
         });
       }
     });*/
+
+    const buffer = bufferize(payload)+'E';
+
+		console.log(buffer);
 
 		var client = new net.Socket();
 			client.connect(config.nodemcu.port, config.nodemcu.host, function() {
