@@ -20,6 +20,7 @@ export default class MyContainer extends React.Component {
       normal: undefined, // Température hors plages en mode auto
       slots: [], // Plages
       id: 0, // Identifiant d'une plage
+			repeat: 0, // Répétitions d'une plage de 5 minutes en marche forcée
 			alert: undefined
     };
   }
@@ -151,6 +152,12 @@ export default class MyContainer extends React.Component {
     });
   }
 
+	onRepeatChange = (value) => {
+    this.setState({
+      repeat: value
+    });
+	}
+
   onSubmit = () => {
     socket.emit('sock_thermostat', this.state);
 		this.setState({
@@ -207,6 +214,7 @@ export default class MyContainer extends React.Component {
               forced={this.state.forced}
               normal={this.state.normal}
               slots={this.state.slots}
+							repeat={this.state.repeat}
               onForcedChange={this.onForcedChange}
               onNormalChange={this.onNormalChange}
               onAddSlot={this.onAddSlot}
@@ -216,6 +224,7 @@ export default class MyContainer extends React.Component {
 							onChangeEnd={this.onChangeEnd}
 							//onToggleUtc={this.onToggleUtc}
 							onToggleDay={this.onToggleDay}
+							onRepeatChange={this.onRepeatChange}
               onSubmit={this.onSubmit} />
           </Col>
         </Row>

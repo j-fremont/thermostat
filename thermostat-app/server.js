@@ -30,37 +30,49 @@ io.on('connection', socket => {
 
   socket.on('sock_thermostat', (payload) => {
 
-    const json = JSON.stringify(payload);
+		sendMCU(payload);
 
-    fs.writeFile("state.json", json, (error) => {
-      if (error) {
-        console.log(error);
-      }
-    });
+    let stringified = JSON.stringify(payload);
 
-		/*client.publish('thermostat', buffer, (error) => {
-      if (error) {
-        console.log(error);
-      } else {
-        fs.writeFile("state.json", json, (error) => {
-          if (error) {
-            console.log(error);
-          }
-        });
-      }
-    });*/
+		const repeat = parseInt(payload.repeat.toString());
 
-    const buffer = bufferize(payload)+'E';
+		if (payload.mode==='forced' && repeat!==0) { // If mode forced for repeat x 5 minutes...
 
-		console.log(buffer);
+			setTimeout(() => {
 
-		var client = new net.Socket();
-			client.connect(config.nodemcu.port, config.nodemcu.host, function() {
-				console.log('Connected');
-				client.write(buffer);
-		});
+				fs.readFile("state.json", (error, stringified) => { // ...restore previous state after repeat x 5 minutes.
+		    	if (error) {
+		      	throw err;
+		    	}
+
+					sendMCU(JSON.parse(stringified));
+		  	});
+
+			}, repeat * 300000);
+
+		} else {
+
+		  fs.writeFile("state.json", stringified, (error) => {
+		    if (error) {
+		      throw err;
+		    }
+		  });
+		}
+
   });
 });
+
+const sendMCU = (json) => {
+
+	const buffer = bufferize(json)+'E';
+	console.log(buffer);
+		
+	var client = new net.Socket();
+		client.connect(config.nodemcu.port, config.nodemcu.host, function() {
+			console.log('Connected');
+			client.write(buffer);
+	});
+}
 
 const bufferize = (json) => {
   var mode;

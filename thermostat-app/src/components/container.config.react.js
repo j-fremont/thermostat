@@ -25,7 +25,9 @@ export default class MyContainerConfig extends React.Component {
       case 'forced':
         return (<MyFormForced
           forced={this.props.forced}
-          onChange={this.props.onForcedChange} />);
+					repeat={this.props.repeat}
+          onForcedChange={this.props.onForcedChange}
+					onRepeatChange={this.props.onRepeatChange} />);
       case 'auto':
         return (<MyFormAuto
           normal={this.props.normal}
