@@ -17,10 +17,10 @@ export default class MyAlert extends React.Component {
 	}
 
 	render() {
-    return (
+		return (
 			<Alert color={this.props.color} isOpen={this.state.open} toggle={this.onDismissAlert}>
 				{this.props.message}
 			</Alert>
-    );
-  }
+		);
+	}
 }

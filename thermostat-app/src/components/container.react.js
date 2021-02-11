@@ -12,121 +12,121 @@ const config = require('../config');
 const socket = io('ws://' + config.server.host + ':' + config.server.port);
 
 export default class MyContainer extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      mode: 'auto', // Mode : forced, auto, off
-      forced: undefined, // Température en mode forced
-      normal: undefined, // Température hors plages en mode auto
-      slots: [], // Plages
-      id: 0, // Identifiant d'une plage
+	constructor(props) {
+		super(props);
+		this.state = {
+			mode: 'auto', // Mode : forced, auto, off
+			forced: undefined, // Température en mode forced
+			normal: undefined, // Température hors plages en mode auto
+			slots: [], // Plages
+			id: 0, // Identifiant d'une plage
 			repeat: 0, // Répétitions d'une plage de 5 minutes en marche forcée
 			alert: undefined
-    };
-  }
+		};
+	}
 
-  componentDidMount() {
-    axios.get("http://" + config.server.host + ":" + config.server.port + "/state").then((response) => {
+	componentDidMount() {
+		axios.get("http://" + config.server.host + ":" + config.server.port + "/state").then((response) => {
 			console.log(response.data);
-      this.setState(response.data);
-    });
-  }
+			this.setState(response.data);
+		});
+	}
 
-  onForcedMode = () => {
-    this.setState({
-      mode: 'forced'
-    });
-  }
+	onForcedMode = () => {
+		this.setState({
+			mode: 'forced'
+		});
+	}
 
-  onAutoMode = () => {
-    this.setState({
-      mode: 'auto'
-    });
-  }
+	onAutoMode = () => {
+		this.setState({
+			mode: 'auto'
+	});
+	}
 
-  onOffMode = () => {
-    this.setState({
-      mode: 'off'
-    });
-  }
+	onOffMode = () => {
+		this.setState({
+			mode: 'off'
+		});
+	}
 
-  onForcedChange = (event) => {
-    this.setState({
-      forced: event.target.value
-    });
-  }
+	onForcedChange = (event) => {
+		this.setState({
+		forced: event.target.value
+		});
+	}
 
-  onNormalChange = (event) => {
-    this.setState({
-      normal: event.target.value
-    });
-  }
+	onNormalChange = (event) => {
+		this.setState({
+			normal: event.target.value
+		});
+	}
 
-  onAddSlot = () => {
+	onAddSlot = () => {
 
 		if (this.state.slots.length < 4) {
 
-		  const id = this.state.id;
+			const id = this.state.id;
 
-		  this.setState({
-		    id: id+1,
-		    slots: [...this.state.slots,
-		      {
-		        id: id,
-		        value: 20,
-		        start: '18:00',
-		        end: '20:00',
+			this.setState({
+				id: id+1,
+				slots: [...this.state.slots,
+					{
+						id: id,
+						value: 20,
+						start: '18:00',
+						end: '20:00',
 						//utc: true,
-		        days: [false, true, true, true, true, true, false]
-		      }
-		    ]
-		  });
+						days: [false, true, true, true, true, true, false]
+					}
+				]
+			});
 		}
-  }
+	}
 
-  onRemoveSlot = (id) => {
+	onRemoveSlot = (id) => {
 
-    const slots = this.state.slots.filter(slot => slot.id !== id);
+		const slots = this.state.slots.filter(slot => slot.id !== id);
 
-    this.setState({
-      slots: slots
-    });
-  }
+		this.setState({
+			slots: slots
+		});
+	}
 
-  onChangeTemperature = (id, value) => {
+	onChangeTemperature = (id, value) => {
 
 		var slots = this.state.slots;
 
 		slots.filter(slot => slot.id === id)[0].value = value;
 
 		this.setState({
-      slots: slots
-    });
-  }
+			slots: slots
+		});
+	}
 
-  onChangeStart = (id, value) => {
+	onChangeStart = (id, value) => {
 
 		var slots = this.state.slots;
 
 		slots.filter(slot => slot.id === id)[0].start = value;
 
 		this.setState({
-      slots: slots
-    });
-  }
+			slots: slots
+		});
+	}
 
-  onChangeEnd = (id, value) => {
+	onChangeEnd = (id, value) => {
 
 		var slots = this.state.slots;
 
 		slots.filter(slot => slot.id === id)[0].end = value;
 
 		this.setState({
-      slots: slots
-    });
-  }
+			slots: slots
+		});
+	}
 
-  /*onToggleUtc = (id) => {
+	/*onToggleUtc = (id) => {
 
 		var slots = this.state.slots;
 
@@ -135,11 +135,11 @@ export default class MyContainer extends React.Component {
 		slot.utc = !slot.utc;
 
 		this.setState({
-      slots: slots
-    });
-  }*/
+			slots: slots
+		});
+	}*/
 
-  onToggleDay = (id, day) => {
+	onToggleDay = (id, day) => {
 
 		var slots = this.state.slots;
 
@@ -148,25 +148,25 @@ export default class MyContainer extends React.Component {
 		slot.days[day] = !slot.days[day];
 
 		this.setState({
-      slots: slots
-    });
-  }
-
-	onRepeatChange = (value) => {
-    this.setState({
-      repeat: value
-    });
+			slots: slots
+		});
 	}
 
-  onSubmit = () => {
-    socket.emit('sock_thermostat', this.state);
+	onRepeatChange = (value) => {
 		this.setState({
-      alert: {
+			repeat: value
+		});
+	}
+
+	onSubmit = () => {
+		socket.emit('sock_thermostat', this.state);
+		this.setState({
+			alert: {
 				color: 'primary',
 				message: 'Message envoyé !'
 			}
-    });
-  }
+		});
+	}
 
 	getAlert = () => {
 		if (this.state.alert!==undefined) {
@@ -178,57 +178,57 @@ export default class MyContainer extends React.Component {
 
 	resetAlert = () => {
 		this.setState({
-      alert: undefined
-    });
+			alert: undefined
+		});
 	}
 
-  render() {
+	render() {
 
 		let alert = this.getAlert();
 
-    return (
-      <Container fluid={true}>
-        <Row>
-          <Col xs="4">
-            <MyMedia mode={this.state.mode} />
-          </Col>
-          <Col xs="4">
-  					<FormGroup>
-    					<ButtonGroup>
+		return (
+			<Container fluid={true}>
+				<Row>
+					<Col xs="4">
+						<MyMedia mode={this.state.mode} />
+					</Col>
+					<Col xs="4">
+						<FormGroup>
+							<ButtonGroup>
 								<MyDropdownMode
-              		onForcedMode={this.onForcedMode}
-              		onAutoMode={this.onAutoMode}
-              		onOffMode={this.onOffMode} />
-            		<Button size="lg" onClick={this.onSubmit}>Envoyer</Button>
-    					</ButtonGroup>
-  					</FormGroup>
-          </Col>
-          <Col xs="4">
+									onForcedMode={this.onForcedMode}
+									onAutoMode={this.onAutoMode}
+									onOffMode={this.onOffMode} />
+								<Button size="lg" onClick={this.onSubmit}>Envoyer</Button>
+							</ButtonGroup>
+						</FormGroup>
+					</Col>
+					<Col xs="4">
 						{alert}
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <MyContainerConfig
-              mode={this.state.mode}
-              forced={this.state.forced}
-              normal={this.state.normal}
-              slots={this.state.slots}
+					</Col>
+				</Row>
+				<Row>
+					<Col>
+						<MyContainerConfig
+							mode={this.state.mode}
+							forced={this.state.forced}
+							normal={this.state.normal}
+							slots={this.state.slots}
 							repeat={this.state.repeat}
-              onForcedChange={this.onForcedChange}
-              onNormalChange={this.onNormalChange}
-              onAddSlot={this.onAddSlot}
-             	onRemoveSlot={this.onRemoveSlot}
+							onForcedChange={this.onForcedChange}
+							onNormalChange={this.onNormalChange}
+							onAddSlot={this.onAddSlot}
+							onRemoveSlot={this.onRemoveSlot}
 							onChangeTemperature={this.onChangeTemperature}
 							onChangeStart={this.onChangeStart}
 							onChangeEnd={this.onChangeEnd}
 							//onToggleUtc={this.onToggleUtc}
 							onToggleDay={this.onToggleDay}
 							onRepeatChange={this.onRepeatChange}
-              onSubmit={this.onSubmit} />
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
+							onSubmit={this.onSubmit} />
+					</Col>
+				</Row>
+			</Container>
+		);
+	}
 }
