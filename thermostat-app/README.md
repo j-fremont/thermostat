@@ -35,9 +35,10 @@ Build Docker image.
 
 Run Docker image.
 ```
-[thermostat-app]$ docker run -d -p 3004:3000 \
+$ docker run -d -p 3004:3000 \
 --restart=always \
 --name=thermostat-app \
 -e NODEJS_HOST='192.168.1.10' \
+-e NODEJS_PORT='9002' \
 thermostat-app
 ```
