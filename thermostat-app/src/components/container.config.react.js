@@ -5,54 +5,54 @@ import MyFormAuto from '../components/form.auto.react';
 import MyFormOff from '../components/form.off.react';
 
 export default class MyContainerConfig extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			dropdownOpen: false
-		};
+  constructor(props) {
+    super(props);
+    this.state = {
+      dropdownOpen: false
+    };
 
-		this.toggle = this.toggle.bind(this);
-	}
+    this.toggle = this.toggle.bind(this);
+  }
 
-	toggle = () => {
-		this.setState({
-			dropdownOpen: !this.state.dropdownOpen
-		});
-	}
+  toggle = () => {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen
+    });
+  }
 
-	currentForm = () => {
-		switch (this.props.mode) {
-			case 'forced':
-				return (<MyFormForced
-					forced={this.props.forced}
-					repeat={this.props.repeat}
-					onForcedChange={this.props.onForcedChange}
-					onRepeatChange={this.props.onRepeatChange} />);
-			case 'auto':
-				return (<MyFormAuto
-					normal={this.props.normal}
-					slots={this.props.slots}
-					onChange={this.props.onNormalChange}
-					onAddSlot={this.props.onAddSlot}
-					onRemoveSlot={this.props.onRemoveSlot}
-					onChangeTemperature={this.props.onChangeTemperature}
-					onChangeStart={this.props.onChangeStart}
-					onChangeEnd={this.props.onChangeEnd}
-					//onToggleUtc={this.props.onToggleUtc}
-					onToggleDay={this.props.onToggleDay} />);
-			case 'off':
-				return (<MyFormOff/>);
-			default:
-				return "Mode inconnu";
-		}
-	}
+  currentForm = () => {
+    switch (this.props.mode) {
+      case 'forced':
+        return (<MyFormForced
+          forced={this.props.forced}
+          repeat={this.props.repeat}
+          onForcedChange={this.props.onForcedChange}
+          onRepeatChange={this.props.onRepeatChange} />);
+      case 'auto':
+        return (<MyFormAuto
+          normal={this.props.normal}
+          slots={this.props.slots}
+          onChange={this.props.onNormalChange}
+          onAddSlot={this.props.onAddSlot}
+          onRemoveSlot={this.props.onRemoveSlot}
+          onChangeTemperature={this.props.onChangeTemperature}
+          onChangeStart={this.props.onChangeStart}
+          onChangeEnd={this.props.onChangeEnd}
+          //onToggleUtc={this.props.onToggleUtc}
+          onToggleDay={this.props.onToggleDay} />);
+      case 'off':
+        return (<MyFormOff/>);
+      default:
+        return "Mode inconnu";
+    }
+  }
 
-	render() {
-		const form = this.currentForm();
-		return (
-			<Row>
-				{form}
-			</Row>
-		);
-	}
+  render() {
+    const form = this.currentForm();
+    return (
+      <Row>
+        {form}
+      </Row>
+    );
+  }
 }
