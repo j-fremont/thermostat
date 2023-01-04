@@ -1,4 +1,4 @@
-#include <PubSubClient.h>
+h #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
@@ -56,13 +56,16 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 // [61-64] : slot 4 - end
 // [65-71] : slot 4 - days
 
-char slots[100] = "0";
+char slots[100] = "12022506000800111111125180020001111111";
+
+//char slots[100] = "0";
 //char slots[100] = "1200";
 //char slots[100] = "120130060008001111100"; // Slot 1 : 30° btw 06:00-08:00 from Monday to Friday
 //char slots[100] = "12023006000800111110030180020001111100"; // Slot 2 : 30° btw 18:00-20:00 from Monday to Friday
 //char slots[100] = "1203300600080011111003018002000111110030080010000000011"; // Slot 3 : 30° btw 08:00-10:00 from Saturday & Sunday
 //char slots[100] = "120430060008001111100301800200011111003008001000000001130190021000000011"; // Slot 4 : 30° btw 19:00-21:00 from Saturday & Sunday
 //char slots[100] = "230";
+
 int SLOT_SIZE = 17;
 
 int tick = 0;
