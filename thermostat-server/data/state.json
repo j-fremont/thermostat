@@ -1,1 +1,1 @@
-{"mode":"auto","forced":"50","normal":"20","slots":[{"id":0,"value":"22","start":"18:00","end":"20:00","days":[true,true,true,true,true,true,true]},{"id":1,"value":"22","start":"06:00","end":"08:00","days":[true,true,true,true,true,true,true]}],"id":2,"repeat":"6"}
+{"mode":"auto","forced":"50","normal":"20","slots":[{"id":0,"value":"20","start":"18:00","end":"20:00","days":[true,true,true,true,true,true,true]},{"id":1,"value":"20","start":"06:00","end":"08:00","days":[true,true,true,true,true,true,true]}],"id":3,"repeat":"6"}

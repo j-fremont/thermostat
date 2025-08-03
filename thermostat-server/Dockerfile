@@ -1,4 +1,4 @@
-FROM balenalib/rpi-alpine-node:latest
+FROM balenalib/rpi-alpine-node:3.14
 
 RUN apk update && apk add gettext
 
